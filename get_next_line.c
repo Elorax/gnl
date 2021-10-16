@@ -1,96 +1,90 @@
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
 
-#ifndef BUFFER_SIZE
- #define BUFFER_SIZE 64
-#endif
+#include "get_next_line.h"
 
-int	ft_strlen(char *s)
+void	ft_char_swap(char *a, char *b)
 {
-	int	i;
+	char	tmp;
 
-	i = 0;
-	while (s[i])
-	{
-		i++;
-	}
-	return (i);
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
 }
 
-char	*ft_strnjoin(char *s1, char *s2, int n)
+void	clean_buffer(char *buffer, int nb, int size)
 {
-	int	size;
-	char	*dest;
 	int	i;
-	int	j;
-
-	size = ft_strlen(s1) + n;
-	dest = malloc(sizeof(char) * (size + 1));
 
 	i = 0;
-	j = 0;
-	while (s1[i])
-	{
-		dest[i] = s1[i];
-		i++;
-	}
-	while (s2[j] && j < n)
-	{
-		dest[i] = s2[j];
-		i++;
-		j++;
-	}
-	dest[i] = 0;
-	return (dest);
+	while (i < nb)
+		buffer[i++] = 0;
+	i = -1;
+	while (++i + nb < size)
+		ft_char_swap(buffer + i, buffer + nb + i);
+}
 
+char	*ft_realloc(char *str, size_t size)
+{
+	char	*tmp;
+	int		i;
+
+	tmp = (char *) malloc(sizeof(char) * (size + BUFFER_SIZE + 1));
+	if (!tmp)
+		return (NULL);
+	i = 0;
+	while (i < size)
+	{
+		tmp[i] = str[i];
+		i++;
+	}
+	if (str)
+		free(str);
+	return (tmp);
+}
+
+void	check_end_of_line(int fd, int *i, char *buffer, char *dest)
+{
+	if (i[1] < BUFFER_SIZE && buffer[i[1]] == '\n')
+	{
+		dest[i[0]] = '\n';
+		(1 + i[0])[dest] = 0;
+		i[2] = 1;
+		clean_buffer(buffer, i[1] + 1, BUFFER_SIZE);
+	}
+	else if (((i[1] < BUFFER_SIZE) && !(buffer[i[1]])) || (i[1] == BUFFER_SIZE))
+	{
+		clean_buffer(buffer, BUFFER_SIZE, BUFFER_SIZE);
+		if (!read(fd, buffer, BUFFER_SIZE))
+		{
+			dest[i[0]] = 0;
+			i[2] = 1;
+		}
+	}
 }
 
 char	*get_next_line(int fd)
 {
-	size_t	ret_read;
-	char	*buffer;
-	size_t	i;
-	char	*dest;
-	char	end_of_line;
+	static char	buffer[BUFFER_SIZE];
+	char		*dest;
+	char		end;
+	int			i[3];
 
-	end_of_line = 0;
-	buffer = malloc(BUFFER_SIZE);
-	i = 0;
-	while (i < BUFFER_SIZE)
+	i[2] = 0;
+	if (!(buffer[0]) && !(read(fd, buffer, BUFFER_SIZE)))
+		return (NULL);
+	dest = NULL;
+	i[0] = 0;
+	while (!i[2])
 	{
-		buffer[i] = 0;
-		i++;
-	}
-	ret_read = 1;
-	int	j = 0;
-	while (!end_of_line && ret_read != 0)
-	{
-		ret_read = read(fd, buffer, BUFFER_SIZE);
-		j++;
-		i = 0;
-		while (buffer[i] != '\n' && i < ret_read)
-			i++;
-		if (i < ret_read)				//'\n' trouve. Attention si \n trouve au dernier caractere. A CORRIGER.
-		{
-			dest = ft_strnjoin(dest, buffer, i + 1);//Alloue une chaine de la taille de dest + i + 2, concatene dest et buffer, termine par zero.
-			printf("LIGNE FINIE APRES %d ITERATIONS\n\n\n", j);
-			end_of_line = 1;
-		}
-		else
-		{
-			dest = ft_strnjoin(dest, buffer, i + 1);
-		}
+		i[1] = 0;
+		dest = ft_realloc(dest, i[0]);
+		if (!dest)
+			return (0);
+		while (i[1] < BUFFER_SIZE && buffer[i[1]] && buffer[i[1]] != '\n')
+			dest[i[0]++] = buffer[i[1]++];
+		check_end_of_line(fd, i, buffer, dest);
 	}
 	return (dest);
-}
-
-int main()
-{
-	int	fichier;
-
-	fichier = open("test.txt", O_RDONLY);
-	printf("-->%s<--", get_next_line(fichier));
-	close(fichier);
 }
