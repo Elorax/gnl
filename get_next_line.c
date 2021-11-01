@@ -44,22 +44,23 @@ char	*ft_realloc(char *str, size_t size)
 	return (tmp);
 }
 
-void	check_end_of_line(int fd, int *i, char *buffer, char *dest)
+void	check_end_of_line(int fd, t_count *count, char *buffer, char *dest)
 {
-	if (i[1] < BUFFER_SIZE && buffer[i[1]] == '\n')
+	if (count->buffer < BUFFER_SIZE && buffer[count->buffer] == '\n')
 	{
-		dest[i[0]] = '\n';
-		(1 + i[0])[dest] = 0;
-		i[2] = 1;
-		clean_buffer(buffer, i[1] + 1, BUFFER_SIZE);
+		dest[count->dest] = '\n';
+		(1 + count->dest)[dest] = 0;
+		count->end = 1;
+		clean_buffer(buffer, count->buffer + 1, BUFFER_SIZE);
 	}
-	else if (((i[1] < BUFFER_SIZE) && !(buffer[i[1]])) || (i[1] == BUFFER_SIZE))
+	else if (((count->buffer < BUFFER_SIZE) && !(buffer[count->buffer]))
+		|| (count->buffer == BUFFER_SIZE))
 	{
 		clean_buffer(buffer, BUFFER_SIZE, BUFFER_SIZE);
 		if (!read(fd, buffer, BUFFER_SIZE))
 		{
-			dest[i[0]] = 0;
-			i[2] = 1;
+			dest[count->dest] = 0;
+			count->end = 1;
 		}
 	}
 }
@@ -68,23 +69,23 @@ char	*get_next_line(int fd)
 {
 	static char	buffer[BUFFER_SIZE];
 	char		*dest;
-	char		end;
-	int			i[3];
+	t_count		count;
 
-	i[2] = 0;
+	count.end = 0;
 	if (!(buffer[0]) && !(read(fd, buffer, BUFFER_SIZE)))
 		return (NULL);
 	dest = NULL;
-	i[0] = 0;
-	while (!i[2])
+	count.dest = 0;
+	while (count.end == 0)
 	{
-		i[1] = 0;
-		dest = ft_realloc(dest, i[0]);
+		count.buffer = 0;
+		dest = ft_realloc(dest, count.dest);
 		if (!dest)
-			return (0);
-		while (i[1] < BUFFER_SIZE && buffer[i[1]] && buffer[i[1]] != '\n')
-			dest[i[0]++] = buffer[i[1]++];
-		check_end_of_line(fd, i, buffer, dest);
+			return (NULL);
+		while (count.buffer < BUFFER_SIZE && buffer[count.buffer]
+			&& buffer[count.buffer] != '\n')
+			dest[(count.dest)++] = buffer[(count.buffer)++];
+		check_end_of_line(fd, &count, buffer, dest);
 	}
 	return (dest);
 }
