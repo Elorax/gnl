@@ -3,7 +3,6 @@
 #include <unistd.h>
 
 #include "get_next_line.h"
-#include "../git_libft/libft.h"
 
 void	ft_char_swap(char *a, char *b)
 {
@@ -29,7 +28,7 @@ void	clean_buffer(char *buffer, int nb, int size)
 char	*ft_realloc(char *str, size_t size)
 {
 	char	*tmp;
-	int		i;
+	size_t		i;
 
 	tmp = (char *) malloc(sizeof(char) * (size + BUFFER_SIZE + 1));
 	if (!tmp)
@@ -89,31 +88,4 @@ char	*get_next_line(int fd)
 		check_end_of_line(fd, &count, buffer, dest);
 	}
 	return (dest);
-}
-
-
-void	check_eol
-
-char	*gnl(int fd)
-{
-	static char	buffer[BUFFER_SIZE];
-	char	*dest;
-	t_count	count;
-	t_list	*lst;
-
-	lst = NULL;
-	count.end = 0;
-	if (!(buffer[0]) && !(read(fd, buffer, BUFFER_SIZE)))
-		return (NULL);
-	count.dest = 0;
-	while(!(count.end))
-	{
-		count.buffer = 0;
-		ft_lstadd_back(&lst, ft_lstnew(buffer));
-		while (count.buffer < BUFFER_SIZE && buffer[count.buffer]
-			&& buffer[count.buffer] != '\n')
-			count.buffer++;
-		check_eol(fd, &count, buffer, lst);
-	}
-	build(dest, lst);
 }
