@@ -14,11 +14,6 @@ void	clean_buffer(char *buffer, int nb, int size)
 	int	i;
 
 	i = 0;
-	/*if (nb >= size)
-	{
-		ft_memset(buffer, 0, BUFFER_SIZE);
-		return ;
-	}*/
 	while (i < nb)
 		buffer[i++] = 0;
 	i = -1;
@@ -34,8 +29,8 @@ void	check_eol(int fd, t_count *count, char *buffer, t_list **lst)
 		count->end = 1;
 		clean_buffer(buffer, count->buffer + 1, BUFFER_SIZE);
 	}
-	else if (((count->buffer < BUFFER_SIZE ) && !(buffer[count->buffer]))
-			|| (count->buffer == BUFFER_SIZE))
+	else if (((count->buffer < BUFFER_SIZE) && !(buffer[count->buffer]))
+		|| (count->buffer == BUFFER_SIZE))
 	{
 		ft_lstadd_back(lst, ft_lstnnew(buffer, count->buffer));
 		clean_buffer(buffer, BUFFER_SIZE, BUFFER_SIZE);
@@ -66,7 +61,6 @@ char	*ft_makeline(t_list *lst, int n)
 			dest[i++] = cpy[j++];
 		cursor = cursor->next;
 	}
-	//dest[i++] = '\n';
 	dest[i] = '\0';
 	return (dest);
 }
@@ -74,9 +68,9 @@ char	*ft_makeline(t_list *lst, int n)
 char	*get_next_line(int fd)
 {
 	static char	buffer[BUFFER_SIZE] = "";
-	char	*dest;
-	t_count	count;
-	t_list	*lst;
+	char		*dest;
+	t_count		count;
+	t_list		*lst;
 
 	count.end = 0;
 	if (!(buffer[0]) && !(read(fd, buffer, BUFFER_SIZE)))
