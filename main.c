@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	if (argc > 1)
 		fichier = open(argv[1], O_RDONLY);
 	else
-		fichier = open("test.txt", O_RDONLY);
+		fichier = open("random500.txt", O_RDONLY);
 	if (fichier == -1)
  	{
 		printf("Erreur lors de l'ouverture du fichier");
