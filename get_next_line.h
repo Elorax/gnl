@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abiersoh <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/22 17:38:10 by abiersoh          #+#    #+#             */
+/*   Updated: 2021/11/22 17:38:49 by abiersoh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # ifndef BUFFER_SIZE
@@ -7,14 +19,14 @@
 # include <stddef.h>
 # include <unistd.h>
 
-typedef struct	s_count
+typedef struct s_count
 {
 	int		dest;
 	int		buffer;
 	char	end;
 }	t_count;
 
-typedef struct	s_list
+typedef struct s_list
 {
 	void			*content;
 	struct s_list	*next;
@@ -23,7 +35,7 @@ typedef struct	s_list
 void	*ft_strndup(char const *s, int n);
 t_list	*ft_lstnnew(void *s, int n);
 void	ft_lstadd_back(t_list **alst, t_list *new);
-int	ft_lstsize(t_list *lst);
+int		ft_lstsize(t_list *lst);
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_char_swap(char *a, char *b);
 void	clean_buffer(char *buffer, int nb, int size);
