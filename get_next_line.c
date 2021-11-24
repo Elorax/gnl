@@ -6,48 +6,42 @@
 /*   By: abiersoh <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 17:37:59 by abiersoh          #+#    #+#             */
-/*   Updated: 2021/11/22 17:38:01 by abiersoh         ###   ########.fr       */
+/*   Updated: 2021/11/24 05:43:06 by abiersoh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_char_swap(char *a, char *b)
-{
-	char	tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
-void	clean_buffer(char *buffer, int nb, int size)
+void	clean_buffer(t_buf *reader)
 {
 	int	i;
 
 	i = 0;
-	while (i < nb)
-		buffer[i++] = 0;
-	i = -1;
-	while (++i + nb < size)
-		ft_char_swap(buffer + i, buffer + nb + i);
+	while (i < reader->memo)
+	{
+		reader->buffer[i] = 0;
+		i++;
+	}
 }
 
-void	check_eol(int fd, t_count *count, char *buffer, t_list **lst)
+void	check_eol(int fd, t_count *count, t_buf *r, t_list **lst)
 {
-	if (count->buffer < BUFFER_SIZE && buffer[count->buffer] == '\n')
+	if (r->memo < BUFFER_SIZE && r->buffer[r->memo] == '\n')
 	{
-		ft_lstadd_back(lst, ft_lstnnew(buffer, count->buffer + 1));
+		ft_lstadd_back(lst, ft_lstnnew(r->buffer, r->begin, r->memo));
 		count->end = 1;
-		clean_buffer(buffer, count->buffer + 1, BUFFER_SIZE);
+		r->begin = r->memo + 1;
+		r->memo++;
 	}
-	else if (((count->buffer < BUFFER_SIZE) && !(buffer[count->buffer]))
-		|| (count->buffer == BUFFER_SIZE))
+	else if (((r->memo < BUFFER_SIZE) && !(r->buffer[r->memo]))
+		|| (r->memo == BUFFER_SIZE))
 	{
-		ft_lstadd_back(lst, ft_lstnnew(buffer, count->buffer));
-		clean_buffer(buffer, BUFFER_SIZE, BUFFER_SIZE);
-		if (!read(fd, buffer, BUFFER_SIZE))
+		ft_lstadd_back(lst, ft_lstnnew(r->buffer, r->begin, r->memo));
+		clean_buffer(r);
+		if (!read(fd, r->buffer, BUFFER_SIZE))
 			count->end = 1;
+		r->memo = 0;
+		r->begin = 0;
 	}
 }
 
@@ -59,7 +53,7 @@ char	*ft_makeline(t_list *lst, int n)
 	size_t	j;
 	char	*cpy;
 
-	dest = (char *) malloc((((ft_lstsize(lst) - 1) * BUFFER_SIZE) + n + 2));
+	dest = (char *) malloc((((ft_lstsize(lst)) * BUFFER_SIZE) + n + 2));
 	if (!dest)
 		return (NULL);
 	i = 0;
@@ -79,27 +73,28 @@ char	*ft_makeline(t_list *lst, int n)
 
 char	*get_next_line(int fd)
 {
-	static char	buffer[BUFFER_SIZE] = "";
-	char		*dest;
-	t_count		count;
-	t_list		*lst;
+	static t_buf	reader = {.buffer = "", .memo = 0, .begin = 0};
+	char			*dest;
+	t_count			count;
+	t_list			*lst;
 
 	count.end = 0;
-	if (!(buffer[0]) && !(read(fd, buffer, BUFFER_SIZE)))
+	if (!(reader.buffer[0]) && (read(fd, reader.buffer, BUFFER_SIZE) <= 0))
 		return (NULL);
-	count.dest = 0;
 	lst = NULL;
 	while (!count.end)
 	{
-		count.buffer = 0;
-		while (count.buffer < BUFFER_SIZE
-			&& buffer[count.buffer] && buffer[count.buffer] != '\n')
-			count.buffer++;
-		check_eol(fd, &count, buffer, &lst);
+		while (reader.memo < BUFFER_SIZE
+			&& reader.buffer[reader.memo] && reader.buffer[reader.memo] != '\n')
+			reader.memo++;
+		check_eol(fd, &count, &reader, &lst);
 	}
-	dest = ft_makeline(lst, count.buffer);
-	if (!dest)
-		return (NULL);
+	dest = ft_makeline(lst, reader.memo);
 	ft_lstclear(&lst, &free);
+	if (!dest || !(*dest))
+	{
+		free(dest);
+		return (NULL);
+	}
 	return (dest);
 }

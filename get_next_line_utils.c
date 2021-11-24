@@ -6,40 +6,41 @@
 /*   By: abiersoh <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 17:38:05 by abiersoh          #+#    #+#             */
-/*   Updated: 2021/11/22 17:38:06 by abiersoh         ###   ########.fr       */
+/*   Updated: 2021/11/24 05:06:26 by abiersoh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	*ft_strndup(char const *s, int n)
+void	*ft_strndup(char const *s, int begin, int end)
 {
 	char	*dest;
 	int		i;
+	int		j;
 
-	i = 0;
-	dest = (char *) malloc(sizeof(char) * (n + 1));
+	i = begin;
+	j = 0;
+	dest = (char *) malloc(sizeof(char) * (end - begin + 2));
 	if (!dest)
 		return (NULL);
-	while (i < n)
+	while (i <= end)
 	{
-		dest[i] = s[i];
+		dest[j] = s[i];
+		j++;
 		i++;
 	}
-	dest[i] = 0;
+	dest[j] = 0;
 	return (dest);
 }
 
-t_list	*ft_lstnnew(void *s, int n)
+t_list	*ft_lstnnew(void *s, int begin, int end)
 {
 	t_list	*l;
-	char	*cpy;
 
 	l = (t_list *) malloc(sizeof(t_list));
 	if (!l)
 		return (NULL);
-	cpy = (char *) s;
-	l->content = ft_strndup((char *)s, n);
+	l->content = ft_strndup((char *)s, begin, end);
 	if (!(l->content))
 	{
 		free(l);
