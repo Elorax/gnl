@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "get_next_line.h"
+#include "gnl.h"
 
 int main(int argc, char **argv)
 {
@@ -12,17 +12,45 @@ int main(int argc, char **argv)
 	if (argc > 1)
 		fichier = open(argv[1], O_RDONLY);
 	else
-		fichier = open("random500.txt", O_RDONLY);
+		fichier = open("test.txt", O_RDONLY);
 	if (fichier == -1)
  	{
 		printf("Erreur lors de l'ouverture du fichier");
 		return (0);
 	}
+
+	int i = 0;
 	while ((s1 = get_next_line(fichier)))
-	{
-		printf("%s", s1);
+		{printf("%s", s1);
 		free(s1);
-	}
+		i++;}
+//	printf("==>%d<==", i);
+/*
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);
+	s1 = get_next_line(fichier);
+		printf("%s", s1);*/
+	free(s1);
 	close(fichier);
 	return (0);
 }

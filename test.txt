@@ -1,5 +1,5 @@
 Voici la ligne numero 1 Elle fait exactement 64 caracteres.....
-Puis la deux !
+Puis la deux
 La c'est la trois
 
 La c'est la 5, la 4 etait vide.
